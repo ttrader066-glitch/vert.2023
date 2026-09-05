@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VERT.2030 — Protokół Wyskoku</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050505;
+  --ink:#f2f2ef;
+  --dim:#8a8a86;
+  --acid:#c8ff00;
+  --violet:#7c5cff;
+  --line:rgba(242,242,239,.12);
+  --card:rgba(255,255,255,.03);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:'Space Grotesk',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+::selection{background:var(--acid);color:#000}
+a{color:inherit}
+
+/* ---------- grain ---------- */
+body::after{
+  content:"";position:fixed;inset:-50%;z-index:999;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  animation:grain 8s steps(10) infinite;
+}
+@keyframes grain{
+  0%,100%{transform:translate(0,0)}10%{transform:translate(-5%,-5%)}
+  30%{transform:translate(3%,-2%)}50%{transform:translate(-2%,3%)}
+  70%{transform:translate(4%,2%)}90%{transform:translate(-3%,1%)}
+}
+
+/* ---------- cursor ---------- */
+.cursor{
+  position:fixed;top:0;left:0;width:14px;height:14px;border-radius:50%;
+  background:var(--acid);z-index:1000;pointer-events:none;
+  mix-blend-mode:difference;transition:transform .15s ease, width .3s, height .3s;
+}
+.cursor.hover{width:60px;height:60px}
+@media(hover:none){.cursor{display:none}body{cursor:auto}}
+
+/* ---------- orb ---------- */
+.orb{
+  position:fixed;width:60vmax;height:60vmax;border-radius:50%;
+  top:-25vmax;right:-20vmax;z-index:0;pointer-events:none;
+  background:radial-gradient(circle at 35% 35%, rgba(124,92,255,.28), rgba(200,255,0,.06) 45%, transparent 70%);
+  filter:blur(40px);
+  animation:drift 14s ease-in-out infinite alternate;
+}
+@keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(-8vmax,6vmax) scale(1.15)}}
+
+/* ---------- layout ---------- */
+.wrap{position:relative;z-index:2;max-width:1400px;margin:0 auto;padding:0 5vw}
+
+/* ---------- nav ---------- */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:22px 5vw;mix-blend-mode:difference;
+}
+nav .logo{font-family:'Syne';font-weight:800;font-size:18px;letter-spacing:.1em}
+nav .links{display:flex;gap:28px;font-size:12px;letter-spacing:.2em;text-transform:uppercase}
+nav .links a{text-decoration:none;opacity:.7;transition:.3s}
+nav .links a:hover{opacity:1;color:var(--acid)}
+@media(max-width:720px){nav .links{display:none}}
+
+/* ---------- hero ---------- */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;position:relative;padding-top:80px}
+.kicker{
+  font-size:12px;letter-spacing:.5em;text-transform:uppercase;color:var(--acid);
+  display:flex;align-items:center;gap:14px;margin-bottom:4vh;
+}
+.kicker::before{content:"";width:48px;height:1px;background:var(--acid)}
+h1{
+  font-family:'Syne';font-weight:800;
+  font-size:clamp(64px,13vw,190px);
+  line-height:.88;letter-spacing:-.03em;text-transform:uppercase;
+}
+h1 .outline{
+  color:transparent;-webkit-text-stroke:1.5px var(--ink);display:block;
+}
+h1 .acid{color:var(--acid)}
+.hero-sub{
+  margin-top:5vh;max-width:520px;color:var(--dim);font-size:clamp(15px,1.4vw,19px);line-height:1.6;font-weight:300;
+}
+.hero-sub b{color:var(--ink);font-weight:500}
+.hero-cta{margin-top:6vh;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.btn{
+  font-family:'Syne';font-weight:700;font-size:13px;letter-spacing:.15em;text-transform:uppercase;
+  padding:18px 36px;border:1px solid var(--acid);color:var(--acid);text-decoration:none;
+  border-radius:100px;position:relative;overflow:hidden;transition:color .4s;z-index:1;
+}
+.btn::before{
+  content:"";position:absolute;inset:0;background:var(--acid);border-radius:100px;
+  transform:translateY(101%);transition:transform .4s cubic-bezier(.76,0,.24,1);z-index:-1;
+}
+.btn:hover{color:#000}
+.btn:hover::before{transform:translateY(0)}
+.btn.ghost{border-color:var(--line);color:var(--ink)}
+.btn.ghost::before{background:var(--ink)}
+.hero-meta{
+  position:absolute;bottom:4vh;right:5vw;text-align:right;font-size:11px;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--dim);line-height:2.2;
+}
+@media(max-width:720px){.hero-meta{display:none}}
+
+/* ---------- marquee ---------- */
+.marquee{
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:20px 0;overflow:hidden;white-space:nowrap;position:relative;z-index:2;
+  background:var(--bg);
+}
+.marquee-track{display:inline-flex;gap:64px;animation:scroll 28s linear infinite;padding-right:64px}
+.marquee span{
+  font-family:'Syne';font-weight:700;font-size:clamp(20px,3vw,34px);text-transform:uppercase;letter-spacing:.02em;
+  display:inline-flex;align-items:center;gap:64px;
+}
+.marquee i{color:var(--acid);font-style:normal;font-size:.7em}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- sections ---------- */
+section{padding:14vh 0;position:relative}
+.sec-head{display:flex;align-items:baseline;gap:28px;margin-bottom:8vh;flex-wrap:wrap}
+.sec-num{font-size:13px;color:var(--acid);letter-spacing:.3em}
+h2{
+  font-family:'Syne';font-weight:800;text-transform:uppercase;
+  font-size:clamp(38px,6.5vw,88px);line-height:.95;letter-spacing:-.02em;
+}
+h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.2px var(--dim)}
+
+/* ---------- stats ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));border-top:1px solid var(--line)}
+.stat{
+  border-bottom:1px solid var(--line);border-right:1px solid var(--line);
+  padding:44px 32px;transition:background .4s;
+}
+.stat:hover{background:var(--card)}
+.stat .n{
+  font-family:'Syne';font-weight:800;font-size:clamp(44px,5vw,72px);line-height:1;
+  color:var(--acid);
+}
+.stat .n small{font-size:.4em;color:var(--ink)}
+.stat p{margin-top:14px;color:var(--dim);font-size:14px;line-height:1.5}
+.stat p b{color:var(--ink);font-weight:500}
+.lead{max-width:680px;color:var(--dim);font-size:clamp(14px,1.3vw,17px);line-height:1.75;margin:-3vh 0 8vh;font-weight:300}
+.lead b{color:var(--ink);font-weight:500}
+
+/* ---------- phases ---------- */
+.phase{
+  border-top:1px solid var(--line);padding:6vh 0;
+  display:grid;grid-template-columns:120px 1fr 1.4fr;gap:5vw;align-items:start;
+  transition:background .4s;
+}
+.phase:last-child{border-bottom:1px solid var(--line)}
+.phase:hover{background:var(--card)}
+.phase .idx{font-family:'Syne';font-weight:800;font-size:clamp(40px,4.5vw,64px);color:transparent;-webkit-text-stroke:1.2px var(--acid)}
+.phase h3{font-family:'Syne';font-weight:700;font-size:clamp(24px,2.6vw,36px);text-transform:uppercase;letter-spacing:-.01em}
+.phase .tag{
+  display:inline-block;margin-top:14px;font-size:11px;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--acid);border:1px solid rgba(200,255,0,.35);border-radius:100px;padding:7px 16px;
+}
+.phase ul{list-style:none;margin-top:6px}
+.phase li{
+  padding:14px 0;border-bottom:1px dashed var(--line);color:var(--dim);font-size:15px;line-height:1.55;
+  display:flex;gap:14px;
+}
+.phase li::before{content:"→";color:var(--acid);flex-shrink:0}
+.phase li b{color:var(--ink);font-weight:500}
+@media(max-width:900px){.phase{grid-template-columns:1fr;gap:24px}}
+
+/* ---------- rules ---------- */
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.rule{background:var(--bg);padding:44px 36px;transition:background .4s}
+.rule:hover{background:var(--card)}
+.rule .rn{font-size:12px;color:var(--acid);letter-spacing:.3em;margin-bottom:22px}
+.rule h4{font-family:'Syne';font-size:22px;font-weight:700;margin-bottom:14px;line-height:1.2}
+.rule p{color:var(--dim);font-size:14.5px;line-height:1.65}
+
+/* ---------- table ---------- */
+.modules table{width:100%;border-collapse:collapse;font-size:15px}
+.modules th{
+  text-align:left;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--acid);
+  padding:18px 16px;border-bottom:1px solid var(--acid);font-weight:500;
+}
+.modules td{padding:20px 16px;border-bottom:1px solid var(--line);color:var(--dim);vertical-align:top;line-height:1.5}
+.modules td:first-child{color:var(--ink);font-weight:500;white-space:nowrap}
+.modules tr{transition:background .3s}
+.modules tbody tr:hover{background:var(--card)}
+@media(max-width:640px){.modules td,.modules th{padding:14px 8px;font-size:13px}}
+
+/* ---------- never ---------- */
+.never-list{list-style:none;counter-reset:nv}
+.never-list li{
+  counter-increment:nv;padding:4vh 0;border-bottom:1px solid var(--line);
+  font-family:'Syne';font-weight:700;font-size:clamp(24px,4vw,52px);
+  text-transform:uppercase;letter-spacing:-.01em;line-height:1.05;
+  display:flex;gap:3vw;align-items:baseline;transition:.4s;
+}
+.never-list li::before{content:"0" counter(nv);font-size:.35em;color:var(--acid);letter-spacing:.2em}
+.never-list li:hover{color:transparent;-webkit-text-stroke:1px var(--ink);padding-left:2vw}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);padding:10vh 0 6vh;position:relative;z-index:2}
+footer .big{
+  font-family:'Syne';font-weight:800;font-size:clamp(48px,10vw,150px);
+  text-transform:uppercase;line-height:.9;letter-spacing:-.02em;
+  color:transparent;-webkit-text-stroke:1.2px var(--dim);transition:.5s;
+}
+footer .big:hover{color:var(--acid);-webkit-text-stroke:0}
+footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:6vh;color:var(--dim);font-size:12px;letter-spacing:.25em;text-transform:uppercase}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(50px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
+.rv.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<div class="cursor"></div>
+<div class="orb"></div>
+
+<nav>
+  <div class="logo">VERT.2030</div>
+  <div class="links">
+    <a href="#nauka">Nauka</a>
+    <a href="#slownik">Słownik</a>
+    <a href="#fazy">Fazy</a>
+    <a href="#zasady">Zasady</a>
+    <a href="#moduly">Moduły</a>
+    <a href="tydzien-1.html">T1</a>
+    <a href="tydzien-2.html">T2</a>
+    <a href="tydzien-3.html">T3</a>
+  </div>
+</nav>
+
+<header class="hero wrap">
+  <div class="kicker rv">Protokół treningowy · 16 tygodni</div>
+  <h1>
+    <span class="rv">Wyskok</span>
+    <span class="outline rv">Maksymalny</span>
+    <span class="acid rv">2030</span>
+  </h1>
+  <p class="hero-sub rv">
+    Siła względna. Szybkość napięcia. Sztywność ścięgien. Technika.
+    <b>Cztery filary, jeden cel</b> — więcej centymetrów nad obręczą.
+  </p>
+  <div class="hero-cta rv">
+    <a class="btn" href="#fazy">Zobacz program</a>
+    <a class="btn ghost" href="#nauka">Dlaczego to działa</a>
+    <a class="btn" href="tydzien-1.html" style="--acid:#7c5cff;color:#c9bcff">Tydzień 1 → Checklist</a>
+  </div>
+  <div class="hero-meta">
+    Siła / Plyometria / RFD<br>
+    Deload → Peak → Test<br>
+    PL · v2.0
+  </div>
+</header>
+
+<div class="marquee">
+  <div class="marquee-track">
+    <span>Depth Jumps <i>◆</i> Trap Bar <i>◆</i> French Contrast <i>◆</i> Pogo Hops <i>◆</i> Boundy <i>◆</i> Jump Squat <i>◆</i></span>
+    <span>Depth Jumps <i>◆</i> Trap Bar <i>◆</i> French Contrast <i>◆</i> Pogo Hops <i>◆</i> Boundy <i>◆</i> Jump Squat <i>◆</i></span>
+  </div>
+</div>
+
+<section id="nauka" class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">01</span>
+    <h2>Od czego <em>zależy</em> wyskok</h2>
+  </div>
+  <div class="stats rv">
+    <div class="stat">
+      <div class="n">2<small>×</small></div>
+      <p><b>Ciężar na sztandze = 1,5–2× Twojej masy ciała.</b> Przy 80 kg ciała → 120–160 kg na gryfie. To marker bazy siłowej, nie warunek startu <span style="color:var(--acid)">(Vertical Jump Bible)</span></p>
+    </div>
+    <div class="stat">
+      <div class="n">2–3<small>/tydz.</small></div>
+      <p>Optymalna częstotliwość sesji skoczności — więcej = ścięgna nie nadążają</p>
+    </div>
+    <div class="stat">
+      <div class="n">3–5<small>min</small></div>
+      <p>Pauza między seriami eksplozji — układ nerwowy potrzebuje pełnej regeneracji</p>
+    </div>
+    <div class="stat">
+      <div class="n">8<small>h</small></div>
+      <p>Sen — adaptacja nerwowo-ścięgnista dzieje się w nocy, nie na sali</p>
+    </div>
+  </div>
+</section>
+
+<section id="slownik" class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">02</span>
+    <h2>Jak czytać <em>plan</em></h2>
+  </div>
+  <div class="rules rv">
+    <div class="rule">
+      <div class="rn">ZAPIS</div>
+      <h4>„4×4–6”</h4>
+      <p>4 serie po 4–6 powtórzeń. To zakres, nie cel — jeśli górna granica przychodzi łatwo, w kolejnej sesji ciężar w górę.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">CIĘŻAR</div>
+      <h4>„@ 80–85%”</h4>
+      <p>Procent maksymalnego pojedynczego powtórzenia (1RM). Nie znasz 1RM? Dobierz ciężar tak, by po każdej serii zostały <b>2 powtórzenia w zapasie</b>.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">PAUZA</div>
+      <h4>3 minuty</h4>
+      <p>Pełna moc wraca po ~3 min. Krótsza przerwa = mniejsza eksplozja w następnej serii. Odpoczynek to część treningu, nie strata czasu.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">PRZED</div>
+      <h4>Rozgrzewka</h4>
+      <p>5 min rower/skakanka + krążenia + 2–3 serie przysiadu z rosnącym ciężarem, zanim dojdziesz do właściwych serii. Zimne ścięgno = kontuzja.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">ĆWICZENIE</div>
+      <h4>RDL</h4>
+      <p>Martwy ciąg na prostych nogach: biodra maksymalnie w tył, sztanga sunie po udach. Buduje pośladki i dwugłowe — mięśnie, które hamują lądowanie.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">ĆWICZENIE</div>
+      <h4>Pogo hops</h4>
+      <p>Niskie podskoki na sztywnych stopach — jakbyś stał na sprężynach, kontakt z podłogą jak najkrótszy. Uczy Achillesa magazynować i oddawać energię.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">ĆWICZENIE</div>
+      <h4>Box jump</h4>
+      <p>Skok NA skrzynię. Zawsze schodź krokami — nigdy nie zeskakuj. Trenujesz eksplozję bez ryzyka lądowania.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">ĆWICZENIE</div>
+      <h4>Depth jump</h4>
+      <p>Start na skrzyni 40–50 cm → krok w dół → natychmiastowy wybuch w górę. Najsilniejszy bodziec reaktywności — dopiero od fazy 2.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">ĆWICZENIE</div>
+      <h4>Izometria</h4>
+      <p>Wytrzymanie pozycji bez ruchu (np. przysiad 90° przez 30 s). Buduje sztywność ścięgien i chroni kolana przed tysiącami skoków.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">METODA</div>
+      <h4>French contrast</h4>
+      <p>Ciężki bodziec (przysiad 85%) + natychmiast eksplozyjny (jump squat, depth jump) w jednej serii. Pobudzenie nerwowe „przelewa się” na skok.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">METODA</div>
+      <h4>Deload</h4>
+      <p>Celowy okres z ~50% obciążenia. Zmęczenie znika, adaptacja dogania — forma skacze w górę. To nie przerwa od planu, to część planu.</p>
+    </div>
+  </div>
+</section>
+
+<section id="fazy" class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">03</span>
+    <h2>Cztery fazy <em>· 16 tygodni</em></h2>
+  </div>
+  <p class="lead rv">
+    <b>Kolejność nie jest przypadkowa:</b> najpierw budujesz silny mięsień (faza 1),
+    potem uczysz się używać go szybko (faza 2), na końcu łączysz oba bodźce
+    dla maksymalnego pobudzenia nerwowego (faza 3). Przeskakiwanie faz
+    zostawia Cię z siłą, której nie umiesz wykorzystać — a test (faza 4) mówi, co dalej.
+  </p>
+
+  <div class="phase rv">
+    <div class="idx">01</div>
+    <div>
+      <h3>Baza siłowa</h3>
+      <span class="tag">Tygodnie 1–6</span>
+    </div>
+    <div>
+      <ul>
+        <li><b>Trening A</b> — przysiad / trap bar 4×4–6 @ 80–85%, pauzy 3 min, bułgar 3×6/noga, RDL 3×6</li>
+        <li><b>Ścięgna</b> — wspięcia z pauzą 4×8 + izometryka przysiadu 30 s ×3 (Achilles = sprężyna)</li>
+        <li><b>Trening B</b> — 5×5 @ 75–80% + pogo hops 3×10 + box jumpy 4×3 (fokus: szybkość zejścia)</li>
+        <li><b>Góra ciała</b> — 1×/tydz. (wyciskanie, wiosłowanie, podciąganie) — pomaga, nie decyduje</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase rv">
+    <div class="idx">02</div>
+    <div>
+      <h3>Moc &amp; Ballistic</h3>
+      <span class="tag">Tygodnie 7–11</span>
+    </div>
+    <div>
+      <ul>
+        <li><b>Maks. szybkość</b> — power clean lub trap bar jump squat 5×3 @ 40–60%</li>
+        <li><b>Intencja</b> — przysiad 3×3 @ 80% z eksplozją w górę w każdej powtórce</li>
+        <li><b>Reaktywność</b> — depth jumps z 40–50 cm 4×4, minimalny czas kontaktu z podłożem</li>
+        <li><b>Wieloskoki</b> — boundy 4×20 m + wspięcia jednonóż 3×8/noga</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase rv">
+    <div class="idx">03</div>
+    <div>
+      <h3>Szczyt / Kontrasty</h3>
+      <span class="tag">Tygodnie 12–15</span>
+    </div>
+    <div>
+      <ul>
+        <li><b>Francuski kontrast</b> — przysiad 3×2 @ 85% → jump squat 3×3 → depth jump 3×3</li>
+        <li><b>Test bojowy</b> — 3 maksymalne skoki z podejścia na koniec każdej sesji</li>
+        <li><b>Pauzy 3–4 min</b> między ćwiczeniami kontrastu — bez skrótów</li>
+        <li><b>Reguła stopu</b> — jeśli wysokość skoków spada, sesja się kończy</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase rv">
+    <div class="idx">04</div>
+    <div>
+      <h3>Test + Deload</h3>
+      <span class="tag">Tydzień 16</span>
+    </div>
+    <div>
+      <ul>
+        <li><b>Deload 4–5 dni</b> — tylko lekkie skoki, pełna regeneracja układu nerwowego</li>
+        <li><b>Pomiar</b> — My Jump 2 / mata skoczna / tablica — zapis wyniku wyjściowego na kolejny cykl</li>
+        <li><b>Nowy baseline</b> — z testu wynika wybór: kolejny cykl siły czy mocy</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="zasady" class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">04</span>
+    <h2>Zasady <em>nieprzekraczalne</em></h2>
+  </div>
+  <div class="rules rv">
+    <div class="rule">
+      <div class="rn">R.01</div>
+      <h4>Jakość &gt; zmęczenie</h4>
+      <p>Trening wyskoku to trening układu nerwowego. Skoki zawsze przed siłą — zmęczenie niszczy jakość i naukę ruchu.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">R.02</div>
+      <h4>Mały krok tygodniowo</h4>
+      <p>+2,5 kg na przysiadzie lub +2 cm na skrzyni. Nigdy oba naraz — progresja musi być mierzalna i powolna.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">R.03</div>
+      <h4>Siła względna</h4>
+      <p>Masa ciała stała lub w dół. +5 kg tłuszczu = −kilka centymetrów. Wyskok to stosunek siły do kilograma.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">R.04</div>
+      <h4>Słuchaj ścięgien</h4>
+      <p>Ból kolan lub Achillesa = sygnał wycofania na 2–3 dni. Ścięgno adaptuje się wolniej niż mięsień i nerwy.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">R.05</div>
+      <h4>Sen = trening</h4>
+      <p>8 godzin snu to część programu, nie dodatek. Adaptacja zachodzi w nocy — sala jest tylko bodźcem.</p>
+    </div>
+    <div class="rule">
+      <div class="rn">R.06</div>
+      <h4>Nie zmieniaj planu</h4>
+      <p>Wyskok rośnie z tygodni napędu, nie z nowości. Program działa wtedy, gdy go dokończysz.</p>
+    </div>
+  </div>
+</section>
+
+<section id="moduly" class="wrap modules">
+  <div class="sec-head rv">
+    <span class="sec-num">05</span>
+    <h2>Moduły <em>opcjonalne</em></h2>
+  </div>
+  <div class="rv">
+  <table>
+    <thead>
+      <tr><th>Moduł</th><th>Po co</th><th>Kiedy</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Mobilność kostki i bioder</td><td>Większa amplituda = wyższy skok</td><td>Codziennie · 5 min</td></tr>
+      <tr><td>Core antyrotacyjny</td><td>Stabilny przekaz siły (Pallof, plank)</td><td>2× tydz. · 10 min</td></tr>
+      <tr><td>Sprinty 10–20 m</td><td>Najlepszy „bezpłatny" trening mocy</td><td>1× tydz. · po rozgrzewce</td></tr>
+      <tr><td>Gra w kosza</td><td>Technika w realnych warunkach + motywacja</td><td>1–2× tydz. · przed cięższymi dniami</td></tr>
+      <tr><td>Kofeina 3–6 mg/kg</td><td>+2–4 cm w teście (potwierdzone badaniami)</td><td>Tylko ważne sesje / testy</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head rv">
+    <span class="sec-num">06</span>
+    <h2>Czego <em>nigdy</em></h2>
+  </div>
+  <ul class="never-list rv">
+    <li>Dużo długodystansowego biegania w trakcie cyklu</li>
+    <li>Skoki „do upadłego" — droga do zapalenia ścięgien</li>
+    <li>Zmienianie programu co 2 tygodnie</li>
+  </ul>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="big rv">Jump<br>Higher.</div>
+    <div class="row">
+      <span>VERT.2030 © Protokół Wyskoku</span>
+      <a href="tydzien-1.html" style="text-decoration:none;color:var(--acid)">Tydzień 1</a>
+      <a href="tydzien-2.html" style="text-decoration:none;color:var(--acid)">2</a>
+      <a href="tydzien-3.html" style="text-decoration:none;color:var(--acid)">3</a>
+      <span>Siła · Plyometria · Regeneracja</span>
+      <span>PL / 16 Weeks</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// custom cursor
+const cur = document.querySelector('.cursor');
+let x=0,y=0,cx=0,cy=0;
+addEventListener('mousemove',e=>{x=e.clientX;y=e.clientY});
+(function loop(){
+  cx+=(x-cx)*.2;cy+=(y-cy)*.2;
+  cur.style.transform=`translate(${cx-7}px,${cy-7}px)`;
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a,button,.rule,.phase,tr,.never-list li').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cur.classList.add('hover'));
+  el.addEventListener('mouseleave',()=>cur.classList.remove('hover'));
+});
+
+// scroll reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}
+}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+// parallax orb
+addEventListener('scroll',()=>{
+  document.querySelector('.orb').style.translate=`0 ${scrollY*.15}px`;
+},{passive:true});
+</script>
+</body>
+</html>
