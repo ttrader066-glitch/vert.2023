@@ -15,9 +15,24 @@
   --violet:#7c5cff;
   --line:rgba(242,242,239,.12);
   --card:rgba(255,255,255,.03);
+  --panel:rgba(5,5,5,.85);
 }
+[data-theme="light"]{
+  --bg:#f2f2ef;
+  --ink:#131311;
+  --dim:#60605b;
+  --acid:#5c7200;
+  --violet:#5a3fd6;
+  --line:rgba(19,19,17,.16);
+  --card:rgba(19,19,17,.045);
+  --panel:rgba(242,242,239,.88);
+}
+[data-theme="light"] nav{mix-blend-mode:normal}
+[data-theme="light"] .orb{opacity:.5}
+.theme-btn{background:transparent;border:1px solid var(--line);color:var(--ink);width:36px;height:36px;border-radius:50%;font-size:15px;cursor:pointer;transition:.3s;flex-shrink:0}
+.theme-btn:hover{border-color:var(--acid);color:var(--acid)}
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;overflow-x:clip}
 body{
   background:var(--bg);color:var(--ink);
   font-family:'Space Grotesk',sans-serif;
@@ -82,7 +97,7 @@ nav .links a:hover{opacity:1;color:var(--acid)}
 .kicker::before{content:"";width:48px;height:1px;background:var(--acid)}
 h1{
   font-family:'Syne';font-weight:800;
-  font-size:clamp(64px,13vw,190px);
+  font-size:clamp(40px,13vw,190px);
   line-height:.88;letter-spacing:-.03em;text-transform:uppercase;
 }
 h1 .outline{
@@ -133,7 +148,7 @@ section{padding:14vh 0;position:relative}
 .sec-num{font-size:13px;color:var(--acid);letter-spacing:.3em}
 h2{
   font-family:'Syne';font-weight:800;text-transform:uppercase;
-  font-size:clamp(38px,6.5vw,88px);line-height:.95;letter-spacing:-.02em;
+  font-size:clamp(26px,6.5vw,88px);line-height:.95;letter-spacing:-.02em;
 }
 h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.2px var(--dim)}
 
@@ -166,7 +181,7 @@ h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.2px var(--dim)}
 .phase h3{font-family:'Syne';font-weight:700;font-size:clamp(24px,2.6vw,36px);text-transform:uppercase;letter-spacing:-.01em}
 .phase .tag{
   display:inline-block;margin-top:14px;font-size:11px;letter-spacing:.25em;text-transform:uppercase;
-  color:var(--acid);border:1px solid rgba(200,255,0,.35);border-radius:100px;padding:7px 16px;
+  color:var(--acid);border:1px solid currentColor;border-radius:100px;padding:7px 16px;
 }
 .phase ul{list-style:none;margin-top:6px}
 .phase li{
@@ -178,7 +193,7 @@ h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.2px var(--dim)}
 @media(max-width:900px){.phase{grid-template-columns:1fr;gap:24px}}
 
 /* ---------- rules ---------- */
-.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
 .rule{background:var(--bg);padding:44px 36px;transition:background .4s}
 .rule:hover{background:var(--card)}
 .rule .rn{font-size:12px;color:var(--acid);letter-spacing:.3em;margin-bottom:22px}
@@ -186,6 +201,7 @@ h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.2px var(--dim)}
 .rule p{color:var(--dim);font-size:14.5px;line-height:1.65}
 
 /* ---------- table ---------- */
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .modules table{width:100%;border-collapse:collapse;font-size:15px}
 .modules th{
   text-align:left;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--acid);
@@ -195,7 +211,7 @@ h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.2px var(--dim)}
 .modules td:first-child{color:var(--ink);font-weight:500;white-space:nowrap}
 .modules tr{transition:background .3s}
 .modules tbody tr:hover{background:var(--card)}
-@media(max-width:640px){.modules td,.modules th{padding:14px 8px;font-size:13px}}
+@media(max-width:640px){.modules td,.modules th{padding:14px 8px;font-size:13px}.modules td:first-child{white-space:normal}}
 
 /* ---------- never ---------- */
 .never-list{list-style:none;counter-reset:nv}
@@ -211,7 +227,7 @@ h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.2px var(--dim)}
 /* ---------- footer ---------- */
 footer{border-top:1px solid var(--line);padding:10vh 0 6vh;position:relative;z-index:2}
 footer .big{
-  font-family:'Syne';font-weight:800;font-size:clamp(48px,10vw,150px);
+  font-family:'Syne';font-weight:800;  font-size:clamp(38px,10vw,150px);
   text-transform:uppercase;line-height:.9;letter-spacing:-.02em;
   color:transparent;-webkit-text-stroke:1.2px var(--dim);transition:.5s;
 }
@@ -222,6 +238,7 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
 .rv{opacity:0;transform:translateY(50px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform .9s cubic-bezier(.22,1,.36,1)}
 .rv.in{opacity:1;transform:none}
 </style>
+<script>try{if(localStorage.getItem('vert-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
 </head>
 <body>
 
@@ -240,6 +257,7 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
     <a href="tydzien-2.html">T2</a>
     <a href="tydzien-3.html">T3</a>
   </div>
+  <button class="theme-btn" id="themeBtn" aria-label="Przełącz motyw">☀</button>
 </nav>
 
 <header class="hero wrap">
@@ -256,7 +274,7 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
   <div class="hero-cta rv">
     <a class="btn" href="#fazy">Zobacz program</a>
     <a class="btn ghost" href="#nauka">Dlaczego to działa</a>
-    <a class="btn" href="tydzien-1.html" style="--acid:#7c5cff;color:#c9bcff">Tydzień 1 → Checklist</a>
+    <a class="btn" href="tydzien-1.html" style="--acid:var(--violet);color:var(--violet)">Tydzień 1 → Checklist</a>
   </div>
   <div class="hero-meta">
     Siła / Plyometria / RFD<br>
@@ -482,6 +500,7 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
     <h2>Moduły <em>opcjonalne</em></h2>
   </div>
   <div class="rv">
+  <div class="table-scroll">
   <table>
     <thead>
       <tr><th>Moduł</th><th>Po co</th><th>Kiedy</th></tr>
@@ -494,6 +513,7 @@ footer .row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;m
       <tr><td>Kofeina 3–6 mg/kg</td><td>+2–4 cm w teście (potwierdzone badaniami)</td><td>Tylko ważne sesje / testy</td></tr>
     </tbody>
   </table>
+  </div>
   </div>
 </section>
 
@@ -548,6 +568,17 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 addEventListener('scroll',()=>{
   document.querySelector('.orb').style.translate=`0 ${scrollY*.15}px`;
 },{passive:true});
+
+// theme toggle
+const tBtn=document.getElementById('themeBtn');
+const tIcon=()=>{tBtn.textContent=document.documentElement.dataset.theme==='light'?'\u263E':'\u2600'};
+tBtn.addEventListener('click',()=>{
+  const light=document.documentElement.dataset.theme==='light';
+  if(light){document.documentElement.removeAttribute('data-theme');localStorage.setItem('vert-theme','dark');}
+  else{document.documentElement.setAttribute('data-theme','light');localStorage.setItem('vert-theme','light');}
+  tIcon();
+});
+tIcon();
 </script>
 </body>
 </html>
